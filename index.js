@@ -77,7 +77,11 @@ app.post("/api/users/:_id/exercises", async (req, res) => {
   }
 });
 
-app.get("api/users/:_id/logs", async (req, res) => {
+app.get("/api/users/:_id/exercises", function (req, res) {
+  res.redirect("/api/users/" + req.params._id + "/logs");
+});
+
+app.get("/api/users/:_id/logs", async (req, res) => {
   const { from, to, limit } = req.query;
   const id = req.params._id;
   const user = await User.findById(id);
@@ -99,11 +103,11 @@ app.get("api/users/:_id/logs", async (req, res) => {
     filter.date = dateObj;
   }
   const exercises = await Exercise.find(filter).limit(+limit ?? 500);
-  const log = exercises.map(e => ({
-    desctiption: e.description,
+  const log = exercises.map((e) => ({
+    description: e.description,
     duration: e.duration,
     date: e.date.toDateString(),
-  }))
+  }));
   res.json({
     username: user.username,
     count: exercises.length,
@@ -111,6 +115,7 @@ app.get("api/users/:_id/logs", async (req, res) => {
     log,
   });
 });
+
 const listener = app.listen(process.env.PORT || 3000, () => {
   console.log("Your app is listening on port " + listener.address().port);
 });
